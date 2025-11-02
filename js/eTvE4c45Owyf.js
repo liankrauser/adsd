@@ -1,880 +1,1009 @@
-(() => {
-    function a(a, e, i, r) {
-        Object.defineProperty(a, e, {
-            get: i,
-            set: r,
-            enumerable: !0,
-            configurable: !0
-        })
-    }
-    var e = "undefined" != typeof globalThis ? globalThis : "undefined" != typeof self ? self : "undefined" != typeof window ? window : "undefined" != typeof global ? global : {},
-        i = {},
-        r = {},
-        t = e.parcelRequirebc80;
-    null == t && ((t = function(a) {
-            if (a in i) return i[a].exports;
-            if (a in r) {
-                var e = r[a];
-                delete r[a];
-                var t = {
-                    id: a,
-                    exports: {}
-                };
-                return i[a] = t, e.call(t.exports, t, t.exports), t.exports
-            }
-            var n = new Error("Cannot find module '" + a + "'");
-            throw n.code = "MODULE_NOT_FOUND", n
-        }).register = function(a, e) {
-            r[a] = e
-        }, e.parcelRequirebc80 = t), t.register("iM5Ye", (function(e, i) {
-            a(e.exports, "FCPThresholds", (() => T)), a(e.exports, "onFCP", (() => M)), a(e.exports, "CLSThresholds", (() => E)), a(e.exports, "onCLS", (() => P)), a(e.exports, "INPThresholds", (() => N)), a(e.exports, "onINP", (() => K)), a(e.exports, "LCPThresholds", (() => D)), a(e.exports, "onLCP", (() => F)), a(e.exports, "TTFBThresholds", (() => O)), a(e.exports, "onTTFB", (() => H));
-            let r = -1;
-            const t = a => {
-                    addEventListener("pageshow", (e => {
-                        e.persisted && (r = e.timeStamp, a(e))
-                    }), !0)
-                },
-                n = (a, e, i, r) => {
-                    let t, n;
-                    return o => {
-                        e.value >= 0 && (o || r) && (n = e.value - (t ?? 0), (n || void 0 === t) && (t = e.value, e.delta = n, e.rating = ((a, e) => a > e[1] ? "poor" : a > e[0] ? "needs-improvement" : "good")(e.value, i), a(e)))
-                    }
-                },
-                o = a => {
-                    requestAnimationFrame((() => requestAnimationFrame((() => a()))))
-                },
-                c = () => {
-                    const a = performance.getEntriesByType("navigation")[0];
-                    if (a && a.responseStart > 0 && a.responseStart < performance.now()) return a
-                },
-                s = () => c()?.activationStart ?? 0,
-                A = (a, e = -1) => {
-                    const i = c();
-                    let t = "navigate";
-                    return r >= 0 ? t = "back-forward-cache" : i && (document.prerendering || s() > 0 ? t = "prerender" : document.wasDiscarded ? t = "restore" : i.type && (t = i.type.replace(/_/g, "-"))), {
-                        name: a,
-                        value: e,
-                        rating: "good",
-                        delta: 0,
-                        entries: [],
-                        id: `v5-${Date.now()}-${Math.floor(8999999999999*Math.random())+1e12}`,
-                        navigationType: t
-                    }
-                },
-                u = new WeakMap;
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Finalize sua compra</title>
+    <meta name="description" content="Finalize sua compra de forma rápida e segura. Aceitamos Pix e ofertas exclusivas para você.">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.0/axios.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-            function l(a, e) {
-                return u.get(a) || u.set(a, new e), u.get(a)
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f7f7f7;
+            color: #262626;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 448px;
+            margin: 0 auto;
+            padding: 24px 16px 96px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background-color: #262626;
+            border-radius: 50%;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .icon-circle {
+            width: 32px;
+            height: 32px;
+            background-color: #e91e63;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .cart-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .product-image {
+            flex-shrink: 0;
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, rgba(233, 30, 99, 0.2), rgba(233, 30, 99, 0.2));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+
+        .product-info {
+            flex: 1;
+        }
+
+        .product-name {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .product-stock {
+            font-size: 12px;
+            color: #737373;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .qty-btn {
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .qty-btn:hover {
+            background-color: #f5f5f5;
+        }
+
+        .qty-value {
+            font-size: 14px;
+            font-weight: 500;
+            width: 32px;
+            text-align: center;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            padding: 8px 0;
+        }
+
+        .price-row.total {
+            font-size: 16px;
+            font-weight: 600;
+            border-top: 1px solid #e5e5e5;
+            padding-top: 12px;
+            margin-top: 8px;
+        }
+
+        .text-muted {
+            color: #737373;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 14px;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            background-color: #f5f5f5;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #e91e63;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .offer-card {
+            background: white;
+            border: 2px solid rgba(233, 30, 99, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .offer-badge {
+            background-color: #262626;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+
+        .offer-content {
+            display: flex;
+            gap: 12px;
+        }
+
+        .offer-image {
+            flex-shrink: 0;
+            width: 64px;
+            height: 64px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+
+        .offer-info {
+            flex: 1;
+        }
+
+        .offer-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .old-price {
+            font-size: 12px;
+            color: #dc2626;
+            text-decoration: line-through;
+            margin-bottom: 4px;
+        }
+
+        .new-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #16a34a;
+        }
+
+        .offer-btn {
+            background-color: #16a34a;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            align-self: center;
+            transition: background-color 0.2s;
+        }
+
+        .offer-btn:hover {
+            background-color: #15803d;
+        }
+
+        .payment-option {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .payment-option:hover {
+            border-color: #e91e63;
+        }
+
+        .payment-option.selected {
+            border-color: #e91e63;
+        }
+
+        .payment-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .payment-icon {
+            width: 48px;
+            height: 48px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .payment-label {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .payment-desc {
+            font-size: 12px;
+            color: #737373;
+        }
+
+        .radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e91e63;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .radio.selected::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #e91e63;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .pay-button {
+            width: 100%;
+            background-color: #e91e63;
+            color: white;
+            border: none;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-bottom: 12px;
+            transition: background-color 0.2s;
+        }
+
+        .pay-button:hover {
+            background-color: #c2185b;
+        }
+
+        .pay-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .terms-text {
+            font-size: 12px;
+            color: #737373;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .review-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .review-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .review-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(233, 30, 99, 0.3), rgba(233, 30, 99, 0.3));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .review-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .stars {
+            display: flex;
+            gap: 2px;
+        }
+
+        .star {
+            color: #fbbf24;
+            font-size: 14px;
+        }
+
+        .star.empty {
+            color: #d1d5db;
+        }
+
+        .review-text {
+            font-size: 14px;
+            color: #737373;
+        }
+
+        /* Modal Pix */
+        .pix-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .pix-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pix-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 448px;
+            width: 100%;
+            position: relative;
+        }
+
+        .pix-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #737373;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+
+        .pix-close:hover {
+            background-color: #f5f5f5;
+        }
+
+        .pix-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .pix-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .pix-status {
+            display: inline-block;
+            background-color: #fef3c7;
+            color: #92400e;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .qrcode-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: center;
+            border: 2px solid #e5e5e5;
+        }
+
+        .qrcode-container img {
+            max-width: 280px;
+            width: 100%;
+            height: auto;
+        }
+
+        .pix-code {
+            background-color: #f5f5f5;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 16px 0;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 11px;
+            color: #262626;
+            border: 1px dashed #e91e63;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .copy-btn {
+            width: 100%;
+            background-color: #16a34a;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-bottom: 12px;
+        }
+
+        .copy-btn:hover {
+            background-color: #15803d;
+        }
+
+        .copy-btn.copied {
+            background-color: #0891b2;
+        }
+
+        .pix-info {
+            background-color: #f0f9ff;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #075985;
+            margin-top: 16px;
+            line-height: 1.5;
+        }
+
+        .pix-expiration {
+            text-align: center;
+            color: #dc2626;
+            font-weight: 600;
+            margin-top: 16px;
+            font-size: 14px;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #e91e63;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background-color: #fee;
+            color: #dc2626;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 16px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Carrinho -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Seu carrinho</h2>
+                <div class="dot"></div>
+            </div>
+
+            <div class="cart-item">
+                <div class="product-image">📱</div>
+                <div class="product-info">
+                    <div class="product-name">iPad 6ª geração A2696 10.9" 64GB rosa 4GB de memória RAM</div>
+                    <div class="product-stock">Últimas Unidades</div>
+                    <div class="quantity-controls">
+                        <button class="qty-btn" onclick="updateQuantity(-1)">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                        <span class="qty-value"><span id="quantity">1</span>x</span>
+                        <button class="qty-btn" onclick="updateQuantity(1)">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div style="border-top: 1px solid #e5e5e5; padding-top: 12px;">
+                <div class="price-row">
+                    <span class="text-muted">Subtotal</span>
+                    <span id="subtotal">R$ 69,90</span>
+                </div>
+                <div class="price-row">
+                    <span class="text-muted">Frete:</span>
+                    <span class="text-muted">-</span>
+                </div>
+                <div class="price-row total">
+                    <span>Total</span>
+                    <span id="total">R$ 69,90</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Identificação -->
+        <div class="card">
+            <div class="section-header">
+                <div class="icon-circle">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <h2 class="card-title">Identificação</h2>
+            </div>
+
+            <div class="input-group">
+                <label for="name">Nome completo</label>
+                <input type="text" id="name" placeholder="Nome e sobrenome">
+            </div>
+
+            <div class="input-group">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" placeholder="seu@email.com">
+            </div>
+
+            <div class="input-group">
+                <label for="document">CPF/CNPJ</label>
+                <input type="text" id="document" placeholder="Número do documento" maxlength="14">
+            </div>
+        </div>
+
+        <!-- Endereço -->
+        <div class="card">
+            <div class="section-header">
+                <div class="icon-circle">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <h2 class="card-title">Endereço</h2>
+            </div>
+
+            <div class="input-group">
+                <input type="text" id="cep" placeholder="CEP">
+            </div>
+
+            <div class="input-group">
+                <input type="text" id="number" placeholder="N da residência">
+            </div>
+
+            <div class="input-group">
+                <input type="text" id="street" placeholder="Rua">
+            </div>
+
+            <div class="input-group">
+                <input type="text" id="city" placeholder="Cidade">
+            </div>
+
+            <div class="input-group">
+                <select id="state">
+                    <option value="">Estado</option>
+                    <option value="AC">AC</option>
+                    <option value="AL">AL</option>
+                    <option value="AP">AP</option>
+                    <option value="AM">AM</option>
+                    <option value="BA">BA</option>
+                    <option value="CE">CE</option>
+                    <option value="DF">DF</option>
+                    <option value="ES">ES</option>
+                    <option value="GO">GO</option>
+                    <option value="MA">MA</option>
+                    <option value="MT">MT</option>
+                    <option value="MS">MS</option>
+                    <option value="MG">MG</option>
+                    <option value="PA">PA</option>
+                    <option value="PB">PB</option>
+                    <option value="PR">PR</option>
+                    <option value="PE">PE</option>
+                    <option value="PI">PI</option>
+                    <option value="RJ">RJ</option>
+                    <option value="RN">RN</option>
+                    <option value="RS">RS</option>
+                    <option value="RO">RO</option>
+                    <option value="RR">RR</option>
+                    <option value="SC">SC</option>
+                    <option value="SP">SP</option>
+                    <option value="SE">SE</option>
+                    <option value="TO">TO</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <input type="text" id="complement" placeholder="Complemento (opcional)">
+            </div>
+        </div>
+
+        <!-- Método de Pagamento -->
+        <div>
+            <h2 class="section-title">Escolha um método de pagamento...</h2>
+
+            <div class="offer-card">
+                <div class="offer-badge">Oferta exclusiva para você!</div>
+                <div class="offer-content">
+                    <div class="offer-image">⌨️</div>
+                    <div class="offer-info">
+                        <div class="offer-title">Magic Keyboard para Mini iPad</div>
+                        <div class="old-price">de R$ 159,90</div>
+                        <div class="new-price">R$ 39,90</div>
+                    </div>
+                    <button class="offer-btn" onclick="addOffer()">Eu quero!</button>
+                </div>
+            </div>
+
+            <div class="payment-option selected" onclick="selectPayment(this)">
+                <div class="payment-content">
+                    <div class="payment-icon">💳</div>
+                    <div>
+                        <div class="payment-label">Pagamento via Pix</div>
+                        <div class="payment-desc">Aprovação imediata.</div>
+                    </div>
+                </div>
+                <div class="radio selected"></div>
+            </div>
+        </div>
+
+        <!-- Botão Pagar -->
+        <button class="pay-button" id="payButton" onclick="processPayment()">Pagar</button>
+
+        <p class="terms-text">
+            Ao finalizar o pagamento você concorda com nossos termos de uso e privacidade.
+        </p>
+
+        <!-- Avaliações -->
+        <div class="review-card">
+            <div class="review-header">
+                <div class="review-avatar">👩</div>
+                <div style="flex: 1;">
+                    <div class="review-name">Carla Alves</div>
+                    <div class="stars">
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star empty">★</span>
+                    </div>
+                </div>
+            </div>
+            <p class="review-text">"Maravilhoooooo, aproveite e peguei, chegou super rápido, é perfeito!"</p>
+        </div>
+
+        <div class="review-card">
+            <div class="review-header">
+                <div class="review-avatar">👨</div>
+                <div style="flex: 1;">
+                    <div class="review-name">André Silva</div>
+                    <div class="stars">
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                    </div>
+                </div>
+            </div>
+            <p class="review-text">"Produto excelente, recomendo demais!"</p>
+        </div>
+    </div>
+
+    <!-- Modal Pix -->
+    <div class="pix-modal" id="pixModal">
+        <div class="pix-content">
+            <button class="pix-close" onclick="closePixModal()">×</button>
+            
+            <div id="pixLoading" style="display: none; text-align: center;">
+                <div class="loading-spinner" style="margin: 20px auto;"></div>
+                <p>Gerando seu Pix...</p>
+            </div>
+
+            <div id="pixSuccess" style="display: none;">
+                <div class="pix-header">
+                    <h2 class="pix-title">✅ Pix Gerado!</h2>
+                    <div class="pix-status">Aguardando Pagamento</div>
+                </div>
+                
+                <p style="text-align: center; color: #737373; font-size: 14px; margin-bottom: 16px;">
+                    Escaneie o QR Code ou copie o código:
+                </p>
+                
+                <div class="qrcode-container">
+                    <img id="qrcodeImage" src="" alt="QR Code Pix">
+                </div>
+
+                <div class="pix-code" id="pixCode"></div>
+
+                <button class="copy-btn" id="copyBtn" onclick="copyPixCode()">
+                    📋 Copiar Código Pix
+                </button>
+
+                <div class="pix-expiration">
+                    ⏰ Expira em: <span id="expirationDate"></span>
+                </div>
+
+                <div class="pix-info">
+                    💡 Após realizar o pagamento, você receberá a confirmação por e-mail e seu pedido será processado automaticamente.
+                </div>
+            </div>
+
+            <div id="pixError" style="display: none; text-align: center;">
+                <h2 class="pix-title">❌ Erro ao Gerar Pix</h2>
+                <div class="error-message" id="errorMessage"></div>
+                <button class="pay-button" onclick="closePixModal()">Tentar Novamente</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ⚠️ ATENÇÃO: ESTA CONFIGURAÇÃO DEVE ESTAR NO BACKEND EM PRODUÇÃO!
+        const NIVUS_API_URL = 'https://api.nivuspayments.com.br/v1/transactions';
+        const NIVUS_API_KEY = 'Basic cGtfMUh3RFJGd3hVakhudXdUbE5zMVVHMTZOUXhhNS05MUlwV0ZpT0ZHd2JqVG82cE5JOnNrX1BqSjJPdlJzRmZDeXB5a3dCdzV3SjNUUHFJa09EbVJDU19ORi1IVk83dDk2c1p3OA==';
+
+        let quantity = 1;
+        const basePrice = 69.90;
+        let currentPixCode = '';
+
+        // Máscara para CPF
+        document.getElementById('document').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length <= 11) {
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
             }
-            class m {
-                t;
-                i = 0;
-                o = [];
-                h(a) {
-                    if (a.hadRecentInput) return;
-                    const e = this.o[0],
-                        i = this.o.at(-1);
-                    this.i && e && i && a.startTime - i.startTime < 1e3 && a.startTime - e.startTime < 5e3 ? (this.i += a.value, this.o.push(a)) : (this.i = a.value, this.o = [a]), this.t?.(a)
-                }
+            e.target.value = value;
+        });
+
+        function updateQuantity(delta) {
+            quantity = Math.max(1, quantity + delta);
+            document.getElementById('quantity').textContent = quantity;
+            updatePrices();
+        }
+
+        function updatePrices() {
+            const total = (basePrice * quantity).toFixed(2).replace('.', ',');
+            document.getElementById('subtotal').textContent = `R$ ${total}`;
+            document.getElementById('total').textContent = `R$ ${total}`;
+        }
+
+        function selectPayment(element) {
+            document.querySelectorAll('.payment-option').forEach(option => {
+                option.classList.remove('selected');
+                option.querySelector('.radio').classList.remove('selected');
+            });
+            element.classList.add('selected');
+            element.querySelector('.radio').classList.add('selected');
+        }
+
+        function addOffer() {
+            alert('Oferta adicionada ao carrinho!');
+        }
+
+        async function processPayment() {
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const document = document.getElementById('document').value.replace(/\D/g, '');
+            const cep = document.getElementById('cep').value.trim();
+            const street = document.getElementById('street').value.trim();
+            const city = document.getElementById('city').value.trim();
+            const state = document.getElementById('state').value;
+
+            // Validações
+            if (!name || !email || !document || !cep || !street || !city || !state) {
+                alert('Por favor, preencha todos os campos obrigatórios.');
+                return;
             }
-            const d = (a, e, i = {}) => {
-                    try {
-                        if (PerformanceObserver.supportedEntryTypes.includes(a)) {
-                            const r = new PerformanceObserver((a => {
-                                Promise.resolve().then((() => {
-                                    e(a.getEntries())
-                                }))
-                            }));
-                            return r.observe({
-                                type: a,
-                                buffered: !0,
-                                ...i
-                            }), r
+
+            if (document.length !== 11) {
+                alert('CPF inválido! Digite os 11 dígitos.');
+                return;
+            }
+
+            // Validação básica de email
+            if (!email.includes('@')) {
+                alert('E-mail inválido!');
+                return;
+            }
+
+            // Desabilita botão e mostra modal com loading
+            const payButton = document.getElementById('payButton');
+            payButton.disabled = true;
+            payButton.innerHTML = '<span class="loading-spinner"></span> Processando...';
+
+            document.getElementById('pixModal').classList.add('active');
+            document.getElementById('pixLoading').style.display = 'block';
+            document.getElementById('pixSuccess').style.display = 'none';
+            document.getElementById('pixError').style.display = 'none';
+
+            try {
+                // Calcula valor total em centavos
+                const totalAmount = Math.round(basePrice * quantity * 100);
+
+                // Cria pagamento Pix na Nivus
+                const response = await axios.post(NIVUS_API_URL, {
+                    paymentMethod: 'pix',
+                    pix: { expiresInDays: 1 },
+                    items: [{
+                        title: 'iPad 6ª geração A2696 10.9" 64GB rosa',
+                        unitPrice: Math.round(basePrice * 100),
+                        quantity: quantity,
+                        tangible: true
+                    }],
+                    customer: {
+                        name: name,
+                        email: email,
+                        document: {
+                            type: 'cpf',
+                            number: document
                         }
-                    } catch {}
-                },
-                p = a => {
-                    let e = !1;
-                    return () => {
-                        e || (a(), e = !0)
+                    },
+                    amount: totalAmount
+                }, {
+                    headers: {
+                        'accept': 'application/json',
+                        'authorization': NIVUS_API_KEY,
+                        'content-type': 'application/json'
                     }
-                };
-            let g = -1;
-            const f = () => "hidden" !== document.visibilityState || document.prerendering ? 1 / 0 : 0,
-                h = a => {
-                    "hidden" === document.visibilityState && g > -1 && (g = "visibilitychange" === a.type ? a.timeStamp : 0, v())
-                },
-                S = () => {
-                    addEventListener("visibilitychange", h, !0), addEventListener("prerenderingchange", h, !0)
-                },
-                v = () => {
-                    removeEventListener("visibilitychange", h, !0), removeEventListener("prerenderingchange", h, !0)
-                },
-                C = () => {
-                    if (g < 0) {
-                        const a = s(),
-                            e = document.prerendering ? void 0 : globalThis.performance.getEntriesByType("visibility-state").filter((e => "hidden" === e.name && e.startTime > a))[0]?.startTime;
-                        g = e ?? f(), S(), t((() => {
-                            setTimeout((() => {
-                                g = f(), S()
-                            }))
-                        }))
-                    }
-                    return {
-                        get firstHiddenTime() {
-                            return g
-                        }
-                    }
-                },
-                y = a => {
-                    document.prerendering ? addEventListener("prerenderingchange", (() => a()), !0) : a()
-                },
-                T = [1800, 3e3],
-                M = (a, e = {}) => {
-                    y((() => {
-                        const i = C();
-                        let r, c = A("FCP");
-                        const u = d("paint", (a => {
-                            for (const e of a) "first-contentful-paint" === e.name && (u.disconnect(), e.startTime < i.firstHiddenTime && (c.value = Math.max(e.startTime - s(), 0), c.entries.push(e), r(!0)))
-                        }));
-                        u && (r = n(a, c, T, e.reportAllChanges), t((i => {
-                            c = A("FCP"), r = n(a, c, T, e.reportAllChanges), o((() => {
-                                c.value = performance.now() - i.timeStamp, r(!0)
-                            }))
-                        })))
-                    }))
-                },
-                E = [.1, .25],
-                P = (a, e = {}) => {
-                    M(p((() => {
-                        let i, r = A("CLS", 0);
-                        const c = l(e, m),
-                            s = a => {
-                                for (const e of a) c.h(e);
-                                c.i > r.value && (r.value = c.i, r.entries = c.o, i())
-                            },
-                            u = d("layout-shift", s);
-                        u && (i = n(a, r, E, e.reportAllChanges), document.addEventListener("visibilitychange", (() => {
-                            "hidden" === document.visibilityState && (s(u.takeRecords()), i(!0))
-                        })), t((() => {
-                            c.i = 0, r = A("CLS", 0), i = n(a, r, E, e.reportAllChanges), o((() => i()))
-                        })), setTimeout(i))
-                    })))
-                };
-            let b = 0,
-                R = 1 / 0,
-                U = 0;
-            const B = a => {
-                for (const e of a) e.interactionId && (R = Math.min(R, e.interactionId), U = Math.max(U, e.interactionId), b = U ? (U - R) / 7 + 1 : 0)
-            };
-            let k;
-            const _ = () => k ? b : performance.interactionCount ?? 0;
-            let w = 0;
-            class L {
-                u = [];
-                l = new Map;
-                m;
-                v;
-                p() {
-                    w = _(), this.u.length = 0, this.l.clear()
-                }
-                P() {
-                    const a = Math.min(this.u.length - 1, Math.floor((_() - w) / 50));
-                    return this.u[a]
-                }
-                h(a) {
-                    if (this.m?.(a), !a.interactionId && "first-input" !== a.entryType) return;
-                    const e = this.u.at(-1);
-                    let i = this.l.get(a.interactionId);
-                    if (i || this.u.length < 10 || a.duration > e.T) {
-                        if (i ? a.duration > i.T ? (i.entries = [a], i.T = a.duration) : a.duration === i.T && a.startTime === i.entries[0].startTime && i.entries.push(a) : (i = {
-                                id: a.interactionId,
-                                entries: [a],
-                                T: a.duration
-                            }, this.l.set(i.id, i), this.u.push(i)), this.u.sort(((a, e) => e.T - a.T)), this.u.length > 10) {
-                            const a = this.u.splice(10);
-                            for (const e of a) this.l.delete(e.id)
-                        }
-                        this.v?.(i)
-                    }
-                }
-            }
-            const I = a => {
-                    const e = globalThis.requestIdleCallback || setTimeout;
-                    "hidden" === document.visibilityState ? a() : (a = p(a), document.addEventListener("visibilitychange", a, {
-                        once: !0
-                    }), e((() => {
-                        a(), document.removeEventListener("visibilitychange", a)
-                    })))
-                },
-                N = [200, 500],
-                K = (a, e = {}) => {
-                    globalThis.PerformanceEventTiming && "interactionId" in PerformanceEventTiming.prototype && y((() => {
-                        "interactionCount" in performance || k || (k = d("event", B, {
-                            type: "event",
-                            buffered: !0,
-                            durationThreshold: 0
-                        }));
-                        let i, r = A("INP");
-                        const o = l(e, L),
-                            c = a => {
-                                I((() => {
-                                    for (const e of a) o.h(e);
-                                    const e = o.P();
-                                    e && e.T !== r.value && (r.value = e.T, r.entries = e.entries, i())
-                                }))
-                            },
-                            s = d("event", c, {
-                                durationThreshold: e.durationThreshold ?? 40
-                            });
-                        i = n(a, r, N, e.reportAllChanges), s && (s.observe({
-                            type: "first-input",
-                            buffered: !0
-                        }), document.addEventListener("visibilitychange", (() => {
-                            "hidden" === document.visibilityState && (c(s.takeRecords()), i(!0))
-                        })), t((() => {
-                            o.p(), r = A("INP"), i = n(a, r, N, e.reportAllChanges)
-                        })))
-                    }))
-                };
-            class G {
-                m;
-                h(a) {
-                    this.m?.(a)
-                }
-            }
-            const D = [2500, 4e3],
-                F = (a, e = {}) => {
-                    y((() => {
-                        const i = C();
-                        let r, c = A("LCP");
-                        const u = l(e, G),
-                            m = a => {
-                                e.reportAllChanges || (a = a.slice(-1));
-                                for (const e of a) u.h(e), e.startTime < i.firstHiddenTime && (c.value = Math.max(e.startTime - s(), 0), c.entries = [e], r())
-                            },
-                            g = d("largest-contentful-paint", m);
-                        if (g) {
-                            r = n(a, c, D, e.reportAllChanges);
-                            const i = p((() => {
-                                m(g.takeRecords()), g.disconnect(), r(!0)
-                            }));
-                            for (const a of ["keydown", "click", "visibilitychange"]) addEventListener(a, (() => I(i)), {
-                                capture: !0,
-                                once: !0
-                            });
-                            t((i => {
-                                c = A("LCP"), r = n(a, c, D, e.reportAllChanges), o((() => {
-                                    c.value = performance.now() - i.timeStamp, r(!0)
-                                }))
-                            }))
-                        }
-                    }))
-                },
-                O = [800, 1800],
-                x = a => {
-                    document.prerendering ? y((() => x(a))) : "complete" !== document.readyState ? addEventListener("load", (() => x(a)), !0) : setTimeout(a)
-                },
-                H = (a, e = {}) => {
-                    let i = A("TTFB"),
-                        r = n(a, i, O, e.reportAllChanges);
-                    x((() => {
-                        const o = c();
-                        o && (i.value = Math.max(o.responseStart - s(), 0), i.entries = [o], r(!0), t((() => {
-                            i = A("TTFB", 0), r = n(a, i, O, e.reportAllChanges), r(!0)
-                        })))
-                    }))
-                }
-        })),
-        function() {
-            const a = {
-                    "Asia/Barnaul": "RU",
-                    "Africa/Nouakchott": "MR",
-                    "Africa/Lusaka": "ZM",
-                    "Asia/Pyongyang": "KP",
-                    "Europe/Bratislava": "SK",
-                    "America/Belize": "BZ",
-                    "America/Maceio": "BR",
-                    "Pacific/Chuuk": "FM",
-                    "Indian/Comoro": "KM",
-                    "Pacific/Palau": "PW",
-                    "Asia/Jakarta": "ID",
-                    "Africa/Windhoek": "NA",
-                    "America/Chihuahua": "MX",
-                    "America/Nome": "US",
-                    "Africa/Mbabane": "SZ",
-                    "Africa/Porto-Novo": "BJ",
-                    "Europe/San_Marino": "SM",
-                    "Pacific/Fakaofo": "TK",
-                    "America/Denver": "US",
-                    "Europe/Belgrade": "RS",
-                    "America/Indiana/Tell_City": "US",
-                    "America/Fortaleza": "BR",
-                    "America/Halifax": "CA",
-                    "Europe/Bucharest": "RO",
-                    "America/Indiana/Petersburg": "US",
-                    "Europe/Kirov": "RU",
-                    "Europe/Athens": "GR",
-                    "America/Argentina/Ushuaia": "AR",
-                    "Europe/Monaco": "MC",
-                    "Europe/Vilnius": "LT",
-                    "Europe/Copenhagen": "DK",
-                    "Pacific/Kanton": "KI",
-                    "America/Caracas": "VE",
-                    "Asia/Almaty": "KZ",
-                    "Europe/Paris": "FR",
-                    "Africa/Blantyre": "MW",
-                    "Asia/Muscat": "OM",
-                    "America/North_Dakota/Beulah": "US",
-                    "America/Matamoros": "MX",
-                    "Asia/Irkutsk": "RU",
-                    "America/Costa_Rica": "CR",
-                    "America/Araguaina": "BR",
-                    "Atlantic/Canary": "ES",
-                    "America/Santo_Domingo": "DO",
-                    "America/Vancouver": "CA",
-                    "Africa/Addis_Ababa": "ET",
-                    "Africa/Accra": "GH",
-                    "Pacific/Kwajalein": "MH",
-                    "Asia/Baghdad": "IQ",
-                    "Australia/Adelaide": "AU",
-                    "Australia/Hobart": "AU",
-                    "America/Guayaquil": "EC",
-                    "America/Argentina/Tucuman": "AR",
-                    "Australia/Lindeman": "AU",
-                    "America/New_York": "US",
-                    "Pacific/Fiji": "FJ",
-                    "America/Antigua": "AG",
-                    "Africa/Casablanca": "MA",
-                    "America/Paramaribo": "SR",
-                    "Africa/Cairo": "EG",
-                    "America/Cayenne": "GF",
-                    "America/Detroit": "US",
-                    "Antarctica/Syowa": "AQ",
-                    "Africa/Douala": "CM",
-                    "America/Argentina/La_Rioja": "AR",
-                    "Africa/Lagos": "NG",
-                    "America/St_Barthelemy": "BL",
-                    "Asia/Nicosia": "CY",
-                    "Asia/Macau": "MO",
-                    "Europe/Riga": "LV",
-                    "Asia/Ashgabat": "TM",
-                    "Indian/Antananarivo": "MG",
-                    "America/Argentina/San_Juan": "AR",
-                    "Asia/Aden": "YE",
-                    "Asia/Tomsk": "RU",
-                    "America/Asuncion": "PY",
-                    "Pacific/Bougainville": "PG",
-                    "Asia/Vientiane": "LA",
-                    "America/Mazatlan": "MX",
-                    "Africa/Luanda": "AO",
-                    "Europe/Oslo": "NO",
-                    "Africa/Kinshasa": "CD",
-                    "Europe/Warsaw": "PL",
-                    "America/Grand_Turk": "TC",
-                    "Asia/Seoul": "KR",
-                    "Africa/Tripoli": "LY",
-                    "America/St_Thomas": "VI",
-                    "Asia/Kathmandu": "NP",
-                    "Pacific/Pitcairn": "PN",
-                    "Pacific/Nauru": "NR",
-                    "America/Curacao": "CW",
-                    "Asia/Kabul": "AF",
-                    "Pacific/Tongatapu": "TO",
-                    "Europe/Simferopol": "UA",
-                    "Asia/Ust-Nera": "RU",
-                    "Africa/Mogadishu": "SO",
-                    "Indian/Mayotte": "YT",
-                    "Pacific/Niue": "NU",
-                    "America/Thunder_Bay": "CA",
-                    "Atlantic/Azores": "PT",
-                    "Pacific/Gambier": "PF",
-                    "Europe/Stockholm": "SE",
-                    "Africa/Libreville": "GA",
-                    "America/Punta_Arenas": "CL",
-                    "America/Guatemala": "GT",
-                    "America/Noronha": "BR",
-                    "Europe/Helsinki": "FI",
-                    "Asia/Gaza": "PS",
-                    "Pacific/Kosrae": "FM",
-                    "America/Aruba": "AW",
-                    "America/Nassau": "BS",
-                    "Asia/Choibalsan": "MN",
-                    "America/Winnipeg": "CA",
-                    "America/Anguilla": "AI",
-                    "Asia/Thimphu": "BT",
-                    "Asia/Beirut": "LB",
-                    "Atlantic/Faroe": "FO",
-                    "Europe/Berlin": "DE",
-                    "Europe/Amsterdam": "NL",
-                    "Pacific/Honolulu": "US",
-                    "America/Regina": "CA",
-                    "America/Scoresbysund": "GL",
-                    "Europe/Vienna": "AT",
-                    "Europe/Tirane": "AL",
-                    "Africa/El_Aaiun": "EH",
-                    "America/Creston": "CA",
-                    "Asia/Qostanay": "KZ",
-                    "Asia/Ho_Chi_Minh": "VN",
-                    "Europe/Samara": "RU",
-                    "Europe/Rome": "IT",
-                    "Australia/Eucla": "AU",
-                    "America/El_Salvador": "SV",
-                    "America/Chicago": "US",
-                    "Africa/Abidjan": "CI",
-                    "Asia/Kamchatka": "RU",
-                    "Pacific/Tarawa": "KI",
-                    "America/Santiago": "CL",
-                    "America/Bahia": "BR",
-                    "Indian/Christmas": "CX",
-                    "Asia/Atyrau": "KZ",
-                    "Asia/Dushanbe": "TJ",
-                    "Europe/Ulyanovsk": "RU",
-                    "America/Yellowknife": "CA",
-                    "America/Recife": "BR",
-                    "Australia/Sydney": "AU",
-                    "America/Fort_Nelson": "CA",
-                    "Pacific/Efate": "VU",
-                    "Europe/Saratov": "RU",
-                    "Africa/Banjul": "GM",
-                    "Asia/Omsk": "RU",
-                    "Europe/Ljubljana": "SI",
-                    "Europe/Budapest": "HU",
-                    "Europe/Astrakhan": "RU",
-                    "America/Argentina/Buenos_Aires": "AR",
-                    "Pacific/Chatham": "NZ",
-                    "America/Argentina/Salta": "AR",
-                    "Africa/Niamey": "NE",
-                    "Asia/Pontianak": "ID",
-                    "Indian/Reunion": "RE",
-                    "Asia/Hong_Kong": "HK",
-                    "Antarctica/McMurdo": "AQ",
-                    "Africa/Malabo": "GQ",
-                    "America/Los_Angeles": "US",
-                    "America/Argentina/Cordoba": "AR",
-                    "Pacific/Pohnpei": "FM",
-                    "America/Tijuana": "MX",
-                    "America/Campo_Grande": "BR",
-                    "America/Dawson_Creek": "CA",
-                    "Asia/Novosibirsk": "RU",
-                    "Pacific/Pago_Pago": "AS",
-                    "Asia/Jerusalem": "IL",
-                    "Europe/Sarajevo": "BA",
-                    "Africa/Freetown": "SL",
-                    "Asia/Yekaterinburg": "RU",
-                    "America/Juneau": "US",
-                    "Africa/Ouagadougou": "BF",
-                    "Africa/Monrovia": "LR",
-                    "Europe/Kiev": "UA",
-                    "America/Argentina/San_Luis": "AR",
-                    "Asia/Tokyo": "JP",
-                    "Asia/Qatar": "QA",
-                    "America/La_Paz": "BO",
-                    "America/Bogota": "CO",
-                    "America/Thule": "GL",
-                    "Asia/Manila": "PH",
-                    "Asia/Hovd": "MN",
-                    "Asia/Tehran": "IR",
-                    "Atlantic/Madeira": "PT",
-                    "America/Metlakatla": "US",
-                    "Europe/Vatican": "VA",
-                    "Asia/Bishkek": "KG",
-                    "Asia/Dili": "TL",
-                    "Antarctica/Palmer": "AQ",
-                    "Atlantic/Cape_Verde": "CV",
-                    "Indian/Chagos": "IO",
-                    "America/Kentucky/Monticello": "US",
-                    "Africa/Algiers": "DZ",
-                    "Africa/Maseru": "LS",
-                    "Asia/Kuala_Lumpur": "MY",
-                    "Africa/Khartoum": "SD",
-                    "America/Argentina/Rio_Gallegos": "AR",
-                    "America/Blanc-Sablon": "CA",
-                    "Africa/Maputo": "MZ",
-                    "America/Tortola": "VG",
-                    "Atlantic/Bermuda": "BM",
-                    "America/Argentina/Catamarca": "AR",
-                    "America/Cayman": "KY",
-                    "America/Puerto_Rico": "PR",
-                    "Pacific/Majuro": "MH",
-                    "Europe/Busingen": "DE",
-                    "Pacific/Midway": "UM",
-                    "Indian/Cocos": "CC",
-                    "Asia/Singapore": "SG",
-                    "America/Boise": "US",
-                    "America/Nuuk": "GL",
-                    "America/Goose_Bay": "CA",
-                    "Australia/Broken_Hill": "AU",
-                    "Africa/Dar_es_Salaam": "TZ",
-                    "Africa/Asmara": "ER",
-                    "Asia/Samarkand": "UZ",
-                    "Asia/Tbilisi": "GE",
-                    "America/Argentina/Jujuy": "AR",
-                    "America/Indiana/Winamac": "US",
-                    "America/Porto_Velho": "BR",
-                    "Asia/Magadan": "RU",
-                    "Europe/Zaporozhye": "UA",
-                    "Antarctica/Casey": "AQ",
-                    "Asia/Shanghai": "CN",
-                    "Pacific/Norfolk": "NF",
-                    "Europe/Guernsey": "GG",
-                    "Australia/Brisbane": "AU",
-                    "Antarctica/DumontDUrville": "AQ",
-                    "America/Havana": "CU",
-                    "America/Atikokan": "CA",
-                    "America/Mexico_City": "MX",
-                    "America/Rankin_Inlet": "CA",
-                    "America/Cuiaba": "BR",
-                    "America/Resolute": "CA",
-                    "Africa/Ceuta": "ES",
-                    "Arctic/Longyearbyen": "SJ",
-                    "Pacific/Guam": "GU",
-                    "Asia/Damascus": "SY",
-                    "Asia/Colombo": "LK",
-                    "Asia/Yerevan": "AM",
-                    "America/Montserrat": "MS",
-                    "America/Belem": "BR",
-                    "Europe/Kaliningrad": "RU",
-                    "Atlantic/South_Georgia": "GS",
-                    "Asia/Tashkent": "UZ",
-                    "Asia/Kolkata": "IN",
-                    "America/St_Johns": "CA",
-                    "Asia/Srednekolymsk": "RU",
-                    "Asia/Yakutsk": "RU",
-                    "Europe/Prague": "CZ",
-                    "Africa/Djibouti": "DJ",
-                    "Asia/Dubai": "AE",
-                    "Europe/Uzhgorod": "UA",
-                    "America/Edmonton": "CA",
-                    "Asia/Famagusta": "CY",
-                    "America/Indiana/Knox": "US",
-                    "Asia/Hebron": "PS",
-                    "Asia/Taipei": "TW",
-                    "Europe/London": "GB",
-                    "Africa/Dakar": "SN",
-                    "Australia/Darwin": "AU",
-                    "America/Glace_Bay": "CA",
-                    "Antarctica/Vostok": "AQ",
-                    "America/Indiana/Vincennes": "US",
-                    "America/Nipigon": "CA",
-                    "Asia/Kuwait": "KW",
-                    "Pacific/Guadalcanal": "SB",
-                    "America/Toronto": "CA",
-                    "Africa/Gaborone": "BW",
-                    "Africa/Bujumbura": "BI",
-                    "Africa/Lubumbashi": "CD",
-                    "America/Merida": "MX",
-                    "America/Marigot": "MF",
-                    "Europe/Zagreb": "HR",
-                    "Pacific/Easter": "CL",
-                    "America/Santarem": "BR",
-                    "Pacific/Noumea": "NC",
-                    "America/Sitka": "US",
-                    "Atlantic/Stanley": "FK",
-                    "Pacific/Funafuti": "TV",
-                    "America/Iqaluit": "CA",
-                    "America/Rainy_River": "CA",
-                    "America/Anchorage": "US",
-                    "America/Lima": "PE",
-                    "Asia/Baku": "AZ",
-                    "America/Indiana/Vevay": "US",
-                    "Asia/Ulaanbaatar": "MN",
-                    "America/Managua": "NI",
-                    "Asia/Krasnoyarsk": "RU",
-                    "Asia/Qyzylorda": "KZ",
-                    "America/Eirunepe": "BR",
-                    "Europe/Podgorica": "ME",
-                    "Europe/Chisinau": "MD",
-                    "Europe/Mariehamn": "AX",
-                    "Europe/Volgograd": "RU",
-                    "Africa/Nairobi": "KE",
-                    "Europe/Isle_of_Man": "IM",
-                    "America/Menominee": "US",
-                    "Africa/Harare": "ZW",
-                    "Asia/Anadyr": "RU",
-                    "America/Moncton": "CA",
-                    "Indian/Maldives": "MV",
-                    "America/Whitehorse": "CA",
-                    "Antarctica/Mawson": "AQ",
-                    "Europe/Madrid": "ES",
-                    "America/Argentina/Mendoza": "AR",
-                    "America/Manaus": "BR",
-                    "Africa/Bangui": "CF",
-                    "Indian/Mauritius": "MU",
-                    "Africa/Tunis": "TN",
-                    "Australia/Lord_Howe": "AU",
-                    "America/Kentucky/Louisville": "US",
-                    "America/North_Dakota/Center": "US",
-                    "Asia/Novokuznetsk": "RU",
-                    "Asia/Makassar": "ID",
-                    "America/Port_of_Spain": "TT",
-                    "America/Bahia_Banderas": "MX",
-                    "Pacific/Auckland": "NZ",
-                    "America/Sao_Paulo": "BR",
-                    "Asia/Dhaka": "BD",
-                    "America/Pangnirtung": "CA",
-                    "Europe/Dublin": "IE",
-                    "Asia/Brunei": "BN",
-                    "Africa/Brazzaville": "CG",
-                    "America/Montevideo": "UY",
-                    "America/Jamaica": "JM",
-                    "America/Indiana/Indianapolis": "US",
-                    "America/Kralendijk": "BQ",
-                    "Europe/Gibraltar": "GI",
-                    "Pacific/Marquesas": "PF",
-                    "Pacific/Apia": "WS",
-                    "Europe/Jersey": "JE",
-                    "America/Phoenix": "US",
-                    "Africa/Ndjamena": "TD",
-                    "Asia/Karachi": "PK",
-                    "Africa/Kampala": "UG",
-                    "Asia/Sakhalin": "RU",
-                    "America/Martinique": "MQ",
-                    "Europe/Moscow": "RU",
-                    "Africa/Conakry": "GN",
-                    "America/Barbados": "BB",
-                    "Africa/Lome": "TG",
-                    "America/Ojinaga": "MX",
-                    "America/Tegucigalpa": "HN",
-                    "Asia/Bangkok": "TH",
-                    "Africa/Johannesburg": "ZA",
-                    "Europe/Vaduz": "LI",
-                    "Africa/Sao_Tome": "ST",
-                    "America/Cambridge_Bay": "CA",
-                    "America/Lower_Princes": "SX",
-                    "America/Miquelon": "PM",
-                    "America/St_Kitts": "KN",
-                    "Australia/Melbourne": "AU",
-                    "Europe/Minsk": "BY",
-                    "Asia/Vladivostok": "RU",
-                    "Europe/Sofia": "BG",
-                    "Antarctica/Davis": "AQ",
-                    "Pacific/Galapagos": "EC",
-                    "America/North_Dakota/New_Salem": "US",
-                    "Asia/Amman": "JO",
-                    "Pacific/Wallis": "WF",
-                    "America/Hermosillo": "MX",
-                    "Pacific/Kiritimati": "KI",
-                    "Antarctica/Macquarie": "AU",
-                    "America/Guyana": "GY",
-                    "Asia/Riyadh": "SA",
-                    "Pacific/Tahiti": "PF",
-                    "America/St_Vincent": "VC",
-                    "America/Cancun": "MX",
-                    "America/Grenada": "GD",
-                    "Pacific/Wake": "UM",
-                    "America/Dawson": "CA",
-                    "Europe/Brussels": "BE",
-                    "Indian/Kerguelen": "TF",
-                    "America/Yakutat": "US",
-                    "Indian/Mahe": "SC",
-                    "Atlantic/Reykjavik": "IS",
-                    "America/Panama": "PA",
-                    "America/Guadeloupe": "GP",
-                    "Europe/Malta": "MT",
-                    "Antarctica/Troll": "AQ",
-                    "Asia/Jayapura": "ID",
-                    "Asia/Bahrain": "BH",
-                    "Asia/Chita": "RU",
-                    "Europe/Tallinn": "EE",
-                    "Asia/Khandyga": "RU",
-                    "America/Rio_Branco": "BR",
-                    "Atlantic/St_Helena": "SH",
-                    "Africa/Juba": "SS",
-                    "America/Adak": "US",
-                    "Pacific/Saipan": "MP",
-                    "America/St_Lucia": "LC",
-                    "America/Inuvik": "CA",
-                    "Europe/Luxembourg": "LU",
-                    "Africa/Bissau": "GW",
-                    "Asia/Oral": "KZ",
-                    "America/Boa_Vista": "BR",
-                    "Europe/Skopje": "MK",
-                    "America/Port-au-Prince": "HT",
-                    "Pacific/Port_Moresby": "PG",
-                    "Europe/Andorra": "AD",
-                    "America/Indiana/Marengo": "US",
-                    "Africa/Kigali": "RW",
-                    "Africa/Bamako": "ML",
-                    "America/Dominica": "DM",
-                    "Asia/Aqtobe": "KZ",
-                    "Europe/Istanbul": "TR",
-                    "Pacific/Rarotonga": "CK",
-                    "America/Danmarkshavn": "GL",
-                    "Europe/Zurich": "CH",
-                    "Asia/Yangon": "MM",
-                    "America/Monterrey": "MX",
-                    "Europe/Lisbon": "PT",
-                    "Asia/Kuching": "MY",
-                    "Antarctica/Rothera": "AQ",
-                    "Australia/Perth": "AU",
-                    "Asia/Phnom_Penh": "KH",
-                    "America/Swift_Current": "CA",
-                    "Asia/Aqtau": "KZ",
-                    "Asia/Urumqi": "CN",
-                    "Asia/Calcutta": "IN"
-                },
-                e = "session-id";
-            let i = "analytics_events";
-            const r = {
-                cookie: "cookie",
-                localStorage: "localStorage",
-                sessionStorage: "sessionStorage"
-            };
-            let n, o, c, s, A, u = r.cookie,
-                l = {},
-                m = !0;
-            if (document.currentScript) {
-                if (s = document.currentScript.getAttribute("data-host"), n = document.currentScript.getAttribute("data-proxy"), o = document.currentScript.getAttribute("data-proxy-url"), c = document.currentScript.getAttribute("data-token"), A = document.currentScript.getAttribute("data-domain"), n && o) throw console.error("Error: Both data-proxy and data-proxy-url are specified. Please use only one of them."), new Error("Both data-proxy and data-proxy-url are specified. Please use only one of them.");
-                i = document.currentScript.getAttribute("data-datasource") || i, u = document.currentScript.getAttribute("data-storage") || u, m = "false" !== document.currentScript.getAttribute("data-stringify-payload");
-                for (const E of document.currentScript.attributes) E.name.startsWith("tb_") && (l[E.name.slice(3).replace(/-/g, "_")] = E.value), E.name.startsWith("data-tb-") && (l[E.name.slice(8).replace(/-/g, "_")] = E.value)
-            }
-            var d = null;
+                });
 
-            function p() {
-                return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (a => (a ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> a / 4).toString(16)))
-            }
+                console.log('Resposta Nivus:', response.data);
 
-            function g() {
-                if ([r.localStorage, r.sessionStorage].includes(u)) {
-                    const a = u === r.localStorage ? localStorage : sessionStorage,
-                        i = a.getItem(e);
-                    if (!i) return null;
-                    let t = null;
-                    try {
-                        t = JSON.parse(i)
-                    } catch (a) {
-                        return null
-                    }
-                    if ("object" != typeof t || null === t) return null;
-                    return (new Date).getTime() > t.expiry ? (a.removeItem(e), null) : t.value
-                }
-                return function() {
-                    let a = {};
-                    return document.cookie.split(";").forEach((function(e) {
-                        let [i, r] = e.split("=");
-                        a[i.trim()] = r
-                    })), a[e]
-                }()
-            }
+                // Esconde loading e mostra sucesso
+                document.getElementById('pixLoading').style.display = 'none';
+                document.getElementById('pixSuccess').style.display = 'block';
 
-            function f() {
-                const a = g() || p();
-                if ([r.localStorage, r.sessionStorage].includes(u)) {
-                    const i = {
-                            value: a,
-                            expiry: (new Date).getTime() + 18e5
-                        },
-                        t = JSON.stringify(i),
-                        n = u === r.localStorage ? localStorage : sessionStorage;
-                    return u === n.setItem(e, t)
-                }
-                return function(a) {
-                    let e = `session-id=${a}; Max-Age=1800; path=/; secure`;
-                    A && (e += `; domain=${A}`), document.cookie = e
-                }(a)
-            }
+                // Preenche os dados do Pix
+                const pixData = response.data.pix;
+                
+                // Gera QR Code
+                const qrcodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(pixData.qrcode)}`;
+                document.getElementById('qrcodeImage').src = qrcodeUrl;
+                
+                // Código Pix
+                document.getElementById('pixCode').textContent = pixData.qrcode;
+                currentPixCode = pixData.qrcode;
+                
+                // Data de expiração
+                const expirationDate = new Date(pixData.expirationDate);
+                document.getElementById('expirationDate').textContent = expirationDate.toLocaleDateString('pt-BR');
 
-            function h(a) {
-                return !(!a || "string" != typeof a) && !(a.length < 2 || a.length > 10240)
-            }!document.currentScript || "true" !== document.currentScript.getAttribute("web-vitals") && "true" !== document.currentScript.getAttribute("data-web-vitals") || (d = t("iM5Ye"));
-            const S = a => {
-                let e = JSON.stringify(a);
-                return ["username", "user", "user_id", "userid", "password", "pass", "pin", "passcode", "token", "api_token", "email", "address", "phone", "sex", "gender", "order", "order_id", "orderid", "payment", "credit_card"].forEach((a => {
-                    e = e.replaceAll(new RegExp(`("${a}"):(".+?"|\\d+)`, "mgi"), '$1:"********"')
-                })), e
-            };
-            async function v(a, e) {
-                if (f(), (r = window.navigator.userAgent) && "string" == typeof r && r.length > 500) return;
-                var r;
-                let t, A;
-                if (o ? t = o : n ? t = `${n}/api/tracking` : s ? (s = s.replaceAll(/\/+$/gm, ""), t = `${s}/v0/events?name=${i}&token=${c}`) : t = `https://api.tinybird.co/v0/events?name=${i}&token=${c}`, m) {
-                    if (A = S(e), A = Object.assign({}, JSON.parse(A), l), A = JSON.stringify(A), !h(A)) return
-                } else {
-                    A = Object.assign({}, e, l);
-                    const a = S(A);
-                    if (!h(a)) return;
-                    A = JSON.parse(a)
+            } catch (error) {
+                console.error('Erro ao criar pagamento:', error);
+                
+                document.getElementById('pixLoading').style.display = 'none';
+                document.getElementById('pixError').style.display = 'block';
+                
+                let errorMsg = 'Ocorreu um erro ao gerar o Pix. Por favor, tente novamente.';
+                if (error.response?.data?.message) {
+                    errorMsg = error.response.data.message;
                 }
-                const u = g() || p(),
-                    d = new XMLHttpRequest;
-                d.open("POST", t, !0), d.setRequestHeader("Content-Type", "application/json"), d.send(JSON.stringify({
-                    timestamp: (new Date).toISOString(),
-                    action: a,
-                    version: "1",
-                    session_id: u,
-                    payload: A
-                }))
+                document.getElementById('errorMessage').textContent = errorMsg;
+            } finally {
+                payButton.disabled = false;
+                payButton.innerHTML = 'Pagar';
             }
+        }
 
-            function C() {
-                let e, i;
-                try {
-                    const r = Intl.DateTimeFormat().resolvedOptions().timeZone;
-                    e = a[r], i = navigator.languages && navigator.languages.length ? navigator.languages[0] : navigator.userLanguage || navigator.language || navigator.browserLanguage || "en"
-                } catch (a) {}
-                return {
-                    country: e,
-                    locale: i
-                }
-            }
+        function copyPixCode() {
+            const copyBtn = document.getElementById('copyBtn');
+            navigator.clipboard.writeText(currentPixCode).then(() => {
+                copyBtn.textContent = '✅ Copiado!';
+                copyBtn.classList.add('copied');
+                
+                setTimeout(() => {
+                    copyBtn.textContent = '📋 Copiar Código Pix';
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                alert('Erro ao copiar. Tente selecionar o texto manualmente.');
+            });
+        }
 
-            function y() {
-                if (window.__nightmare || window.navigator.webdriver || window.Cypress) return;
-                const {
-                    country: a,
-                    locale: e
-                } = C();
-                setTimeout((() => {
-                    v("page_hit", {
-                        "user-agent": window.navigator.userAgent,
-                        locale: e,
-                        location: a,
-                        referrer: document.referrer,
-                        pathname: window.location.pathname,
-                        href: window.location.href
-                    })
-                }), 300)
+        function closePixModal() {
+            document.getElementById('pixModal').classList.remove('active');
+        }
+
+        // Fecha modal ao clicar fora
+        document.getElementById('pixModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePixModal();
             }
-            if (d) {
-                function T(a) {
-                    try {
-                        const {
-                            country: e,
-                            locale: i
-                        } = C();
-                        v("web_vital", {
-                            name: a.name,
-                            value: a.value,
-                            delta: a.delta,
-                            rating: a.rating,
-                            id: a.id,
-                            navigationType: a.navigationType,
-                            pathname: window.location.pathname,
-                            href: window.location.href,
-                            "user-agent": window.navigator.userAgent,
-                            locale: i,
-                            location: e,
-                            referrer: document.referrer
-                        })
-                    } catch (a) {
-                        console.error("Error sending web vital:", a)
-                    }
-                }
-                d.onCLS && d.onCLS(T), d.onFCP && d.onFCP(T), d.onLCP && d.onLCP(T), d.onTTFB && d.onTTFB(T), d.onINP && d.onINP(T)
-            }
-            window.Tinybird = {
-                trackEvent: v
-            }, window.addEventListener("hashchange", y);
-            const M = window.history;
-            if (M.pushState) {
-                const P = M.pushState;
-                M.pushState = function() {
-                    P.apply(this, arguments), y()
-                }, window.addEventListener("popstate", y)
-            }
-            "prerender" === document.visibilityState ? document.addEventListener("visibilitychange", (function() {
-                "visible" === document.visibilityState && y()
-            })) : y()
-        }()
-})();
+        });
+    </script>
+</body>
+</html>

@@ -555,6 +555,8 @@
             border-top: 3px solid #e91e63;
             border-radius: 50%;
             animation: spin 1s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
         }
 
         @keyframes spin {
@@ -727,7 +729,7 @@
                 </div>
             </div>
 
-            <div class="payment-option selected" onclick="selectPayment(this)">
+            <div class="payment-option selected">
                 <div class="payment-content">
                     <div class="payment-icon">💳</div>
                     <div>
@@ -787,9 +789,9 @@
         <div class="pix-content">
             <button class="pix-close" onclick="closePixModal()">×</button>
             
-            <div id="pixLoading" style="display: none; text-align: center;">
-                <div class="loading-spinner" style="margin: 20px auto;"></div>
-                <p>Gerando seu Pix...</p>
+            <div id="pixLoading" style="display: none; text-align: center; padding: 20px;">
+                <div class="loading-spinner" style="width: 40px; height: 40px; margin: 20px auto;"></div>
+                <p style="margin-top: 16px;">Gerando seu Pix...</p>
             </div>
 
             <div id="pixSuccess" style="display: none;">
@@ -821,7 +823,7 @@
                 </div>
             </div>
 
-            <div id="pixError" style="display: none; text-align: center;">
+            <div id="pixError" style="display: none; text-align: center; padding: 20px;">
                 <h2 class="pix-title">❌ Erro ao Gerar Pix</h2>
                 <div class="error-message" id="errorMessage"></div>
                 <button class="pay-button" onclick="closePixModal()">Tentar Novamente</button>
@@ -830,7 +832,7 @@
     </div>
 
     <script>
-        // ⚠️ ATENÇÃO: ESTA CONFIGURAÇÃO DEVE ESTAR NO BACKEND EM PRODUÇÃO!
+        // ⚠️ ATENÇÃO: EM PRODUÇÃO, MOVA ISSO PARA O BACKEND!
         const NIVUS_API_URL = 'https://api.nivuspayments.com.br/v1/transactions';
         const NIVUS_API_KEY = 'Basic cGtfMUh3RFJGd3hVakhudXdUbE5zMVVHMTZOUXhhNS05MUlwV0ZpT0ZHd2JqVG82cE5JOnNrX1BqSjJPdlJzRmZDeXB5a3dCdzV3SjNUUHFJa09EbVJDU19ORi1IVk83dDk2c1p3OA==';
 
@@ -861,149 +863,28 @@
             document.getElementById('total').textContent = `R$ ${total}`;
         }
 
-        function selectPayment(element) {
-            document.querySelectorAll('.payment-option').forEach(option => {
-                option.classList.remove('selected');
-                option.querySelector('.radio').classList.remove('selected');
-            });
-            element.classList.add('selected');
-            element.querySelector('.radio').classList.add('selected');
-        }
-
         function addOffer() {
             alert('Oferta adicionada ao carrinho!');
         }
 
         async function processPayment() {
+            console.log('Botão clicado!'); // Debug
+            
             const name = document.getElementById('name').value.trim();
             const email = document.getElementById('email').value.trim();
-            const document = document.getElementById('document').value.replace(/\D/g, '');
+            const doc = document.getElementById('document').value.replace(/\D/g, '');
             const cep = document.getElementById('cep').value.trim();
             const street = document.getElementById('street').value.trim();
             const city = document.getElementById('city').value.trim();
             const state = document.getElementById('state').value;
 
             // Validações
-            if (!name || !email || !document || !cep || !street || !city || !state) {
+            if (!name || !email || !doc || !cep || !street || !city || !state) {
                 alert('Por favor, preencha todos os campos obrigatórios.');
                 return;
             }
 
-            if (document.length !== 11) {
+            if (doc.length !== 11) {
                 alert('CPF inválido! Digite os 11 dígitos.');
                 return;
             }
-
-            // Validação básica de email
-            if (!email.includes('@')) {
-                alert('E-mail inválido!');
-                return;
-            }
-
-            // Desabilita botão e mostra modal com loading
-            const payButton = document.getElementById('payButton');
-            payButton.disabled = true;
-            payButton.innerHTML = '<span class="loading-spinner"></span> Processando...';
-
-            document.getElementById('pixModal').classList.add('active');
-            document.getElementById('pixLoading').style.display = 'block';
-            document.getElementById('pixSuccess').style.display = 'none';
-            document.getElementById('pixError').style.display = 'none';
-
-            try {
-                // Calcula valor total em centavos
-                const totalAmount = Math.round(basePrice * quantity * 100);
-
-                // Cria pagamento Pix na Nivus
-                const response = await axios.post(NIVUS_API_URL, {
-                    paymentMethod: 'pix',
-                    pix: { expiresInDays: 1 },
-                    items: [{
-                        title: 'iPad 6ª geração A2696 10.9" 64GB rosa',
-                        unitPrice: Math.round(basePrice * 100),
-                        quantity: quantity,
-                        tangible: true
-                    }],
-                    customer: {
-                        name: name,
-                        email: email,
-                        document: {
-                            type: 'cpf',
-                            number: document
-                        }
-                    },
-                    amount: totalAmount
-                }, {
-                    headers: {
-                        'accept': 'application/json',
-                        'authorization': NIVUS_API_KEY,
-                        'content-type': 'application/json'
-                    }
-                });
-
-                console.log('Resposta Nivus:', response.data);
-
-                // Esconde loading e mostra sucesso
-                document.getElementById('pixLoading').style.display = 'none';
-                document.getElementById('pixSuccess').style.display = 'block';
-
-                // Preenche os dados do Pix
-                const pixData = response.data.pix;
-                
-                // Gera QR Code
-                const qrcodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(pixData.qrcode)}`;
-                document.getElementById('qrcodeImage').src = qrcodeUrl;
-                
-                // Código Pix
-                document.getElementById('pixCode').textContent = pixData.qrcode;
-                currentPixCode = pixData.qrcode;
-                
-                // Data de expiração
-                const expirationDate = new Date(pixData.expirationDate);
-                document.getElementById('expirationDate').textContent = expirationDate.toLocaleDateString('pt-BR');
-
-            } catch (error) {
-                console.error('Erro ao criar pagamento:', error);
-                
-                document.getElementById('pixLoading').style.display = 'none';
-                document.getElementById('pixError').style.display = 'block';
-                
-                let errorMsg = 'Ocorreu um erro ao gerar o Pix. Por favor, tente novamente.';
-                if (error.response?.data?.message) {
-                    errorMsg = error.response.data.message;
-                }
-                document.getElementById('errorMessage').textContent = errorMsg;
-            } finally {
-                payButton.disabled = false;
-                payButton.innerHTML = 'Pagar';
-            }
-        }
-
-        function copyPixCode() {
-            const copyBtn = document.getElementById('copyBtn');
-            navigator.clipboard.writeText(currentPixCode).then(() => {
-                copyBtn.textContent = '✅ Copiado!';
-                copyBtn.classList.add('copied');
-                
-                setTimeout(() => {
-                    copyBtn.textContent = '📋 Copiar Código Pix';
-                    copyBtn.classList.remove('copied');
-                }, 2000);
-            }).catch(() => {
-                alert('Erro ao copiar. Tente selecionar o texto manualmente.');
-            });
-        }
-
-        function closePixModal() {
-            document.getElementById('pixModal').classList.remove('active');
-        }
-
-        // Fecha modal ao clicar fora
-        document.getElementById('pixModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closePixModal();
-            }
-        });
-    </script>
-</body>
-</html>
